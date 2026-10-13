@@ -15,36 +15,61 @@
                 <p>前端开发 / 内容创作者</p>
             </div>
         </header>
+
         <main class="main">
             <section class="intro">
                 <h2>个人介绍</h2>
-                <p>💻 喜欢使用简洁代码构建有温度的页面，目前专注于交互设计与性能优化。</p>
+                <p>
+                    💻 喜欢使用简洁代码构建有温度的页面，
+                    目前专注于交互设计与性能优化。
+                </p>
             </section>
+
             <section class="skills">
                 <h2>技能</h2>
                 <div class="skill-list">
-                    <span>HTML / CSS</span><span>JavaScript</span><span>React</span>
-                    <span>Vue</span><span>Git</span><span>Figma</span>
+                    <span>HTML / CSS</span>
+                    <span>JavaScript</span>
+                    <span>React</span>
+                    <span>Vue</span>
+                    <span>Git</span>
+                    <span>Figma</span>
                 </div>
             </section>
+
             <section class="works">
                 <h2>作品展示</h2>
                 <p>个人博客页面、响应式网页设计、Vue 项目开发等。</p>
             </section>
+
             <section class="todo">
                 <h2>Todo 列表</h2>
+
                 <label for="todo-input">新的待办事项</label>
                 <div class="todo-controls">
-                    <input id="todo-input" type="text" placeholder="输入待办事项" autocomplete="off">
+                    <input
+                        id="todo-input"
+                        type="text"
+                        placeholder="输入待办事项"
+                        autocomplete="off"
+                    >
                     <button id="add-todo" type="button">添加</button>
                 </div>
+
+                <div id="todo-filters" aria-label="任务筛选">
+                    <button type="button" data-filter="all">全部</button>
+                    <button type="button" data-filter="active">未完成</button>
+                    <button type="button" data-filter="done">已完成</button>
+                </div>
+
                 <p id="todo-message" class="todo-message" role="status"></p>
                 <ul id="todo-list" aria-label="待办事项列表"></ul>
             </section>
         </main>
+
         <footer class="footer">© 2026 徐楠 · 保持好奇</footer>
     </div>
-    <!-- 放在 body 末尾，确保上面的 DOM 已加载。 -->
+
     <script src="script.js"></script>
 </body>
 </html>

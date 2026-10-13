@@ -2,19 +2,23 @@ const todoInput = document.getElementById('todo-input');
 const addTodoButton = document.getElementById('add-todo');
 const todoList = document.getElementById('todo-list');
 const todoMessage = document.getElementById('todo-message');
+const filterButtons = document.querySelectorAll('#todo-filters button');
 
-// localStorage 中使用的存储键名。
+// 本地存储键名。
 const KEY = 'todos';
 
-// 页面启动时读取任务，todos 仍是唯一数据源。
+// todos 是任务数据的唯一来源。
 let todos = load();
 
-// 将数组转成字符串后保存。
+// 筛选属于视图状态，刷新后回到全部。
+let filter = 'all';
+
+// 保存任务数据。
 function save() {
     localStorage.setItem(KEY, JSON.stringify(todos));
 }
 
-// 从本地读取字符串，恢复为数组。
+// 页面启动时恢复任务数据。
 function load() {
     try {
         const raw = localStorage.getItem(KEY);
@@ -28,7 +32,7 @@ function load() {
     }
 }
 
-// 添加：展开运算符生成新数组。
+// 添加：生成新数组 → 保存 → 重渲染。
 function addTodo(text) {
     const content = text.trim();
     if (content === '') return;
@@ -44,34 +48,56 @@ function addTodo(text) {
     render();
 }
 
-// 删除：保留 id 不匹配的任务，生成新数组。
+// 删除：生成新数组 → 保存 → 重渲染。
 function removeTodo(id) {
     todos = todos.filter(todo => todo.id !== id);
     save();
     render();
 }
 
-// 切换：生成新数组，并为匹配的任务生成新对象。
+// 切换：生成新数组和新对象 → 保存 → 重渲染。
 function toggleTodo(id) {
     todos = todos.map(todo =>
         todo.id === id
             ? { ...todo, completed: !todo.completed }
             : todo
     );
+
     save();
     render();
 }
 
-// 根据 todos 重画列表。
+// 切换筛选条件，任务数据不变。
+function setFilter(value) {
+    filter = value;
+    render();
+}
+
+// 根据任务数据和筛选状态重画列表。
 function render() {
     todoList.innerHTML = '';
 
-    todos.forEach(todo => {
+    const shown = todos.filter(todo => {
+        if (filter === 'done') return todo.completed;
+        if (filter === 'active') return !todo.completed;
+        return true;
+    });
+
+    // 更新筛选按钮的选中样式。
+    filterButtons.forEach(button => {
+        const selected = button.dataset.filter === filter;
+        button.classList.toggle('is-active', selected);
+        button.setAttribute('aria-pressed', String(selected));
+    });
+
+    shown.forEach(todo => {
         const li = document.createElement('li');
         li.dataset.id = todo.id;
 
         const text = document.createElement('span');
         text.className = 'todo-text';
+
+        // 用户输入作为文本显示。
         text.textContent = todo.text;
         li.appendChild(text);
 
@@ -88,7 +114,7 @@ function render() {
         deleteButton.textContent = '删除';
 
         deleteButton.addEventListener('click', event => {
-            // 防止删除按钮的点击同时触发 li 的点击。
+            // 防止删除时同时触发任务状态切换。
             event.stopPropagation();
             removeTodo(todo.id);
         });
@@ -98,7 +124,7 @@ function render() {
     });
 }
 
-// 处理输入框：检查空输入，添加后清空。
+// 检查输入，添加成功后清空输入框。
 function handleAdd() {
     const content = todoInput.value.trim();
 
@@ -114,8 +140,10 @@ function handleAdd() {
     todoInput.focus();
 }
 
+// 点击按钮添加任务。
 addTodoButton.addEventListener('click', handleAdd);
 
+// 按回车添加，避开中文输入法的选词回车。
 todoInput.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !event.isComposing) {
         event.preventDefault();
@@ -123,4 +151,12 @@ todoInput.addEventListener('keydown', event => {
     }
 });
 
+// 点击按钮切换筛选条件。
+filterButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        setFilter(button.dataset.filter);
+    });
+});
+
+// 显示启动时恢复的任务。
 render();
