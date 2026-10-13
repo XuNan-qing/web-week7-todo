@@ -3,8 +3,30 @@ const addTodoButton = document.getElementById('add-todo');
 const todoList = document.getElementById('todo-list');
 const todoMessage = document.getElementById('todo-message');
 
-// todos 是任务数据的唯一来源。
-let todos = [];
+// localStorage 中使用的存储键名。
+const KEY = 'todos';
+
+// 页面启动时读取任务，todos 仍是唯一数据源。
+let todos = load();
+
+// 将数组转成字符串后保存。
+function save() {
+    localStorage.setItem(KEY, JSON.stringify(todos));
+}
+
+// 从本地读取字符串，恢复为数组。
+function load() {
+    try {
+        const raw = localStorage.getItem(KEY);
+        if (raw === null) return [];
+
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+    } catch (error) {
+        console.warn('读取任务失败，使用空列表。', error);
+        return [];
+    }
+}
 
 // 添加：展开运算符生成新数组。
 function addTodo(text) {
@@ -18,12 +40,14 @@ function addTodo(text) {
     };
 
     todos = [...todos, newTodo];
+    save();
     render();
 }
 
 // 删除：保留 id 不匹配的任务，生成新数组。
 function removeTodo(id) {
     todos = todos.filter(todo => todo.id !== id);
+    save();
     render();
 }
 
@@ -34,6 +58,7 @@ function toggleTodo(id) {
             ? { ...todo, completed: !todo.completed }
             : todo
     );
+    save();
     render();
 }
 
