@@ -55,6 +55,19 @@ function removeTodo(id) {
     render();
 }
 
+function clearCompleted() {
+    todos = todos.filter(todo => !todo.completed);
+    save();
+    render();
+}
+
+// 清除已完成任务：生成新数组 → 保存 → 重渲染。
+function clearCompleted() {
+    todos = todos.filter(todo => !todo.completed);
+    save();
+    render();
+}
+
 // 切换：生成新数组和新对象 → 保存 → 重渲染。
 function toggleTodo(id) {
     todos = todos.map(todo =>
