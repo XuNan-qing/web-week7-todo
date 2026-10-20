@@ -97,40 +97,31 @@ function render() {
         button.setAttribute('aria-pressed', String(selected));
     });
 
-    shown.forEach(todo => {
+        shown.forEach(todo => {
         const li = document.createElement('li');
         li.dataset.id = todo.id;
 
         const text = document.createElement('span');
         text.className = 'todo-text';
-
-        // 用户输入作为文本显示。
         text.textContent = todo.text;
-        li.appendChild(text);
 
         if (todo.completed) {
             li.classList.add('done');
         }
 
-        li.addEventListener('click', () => {
-            toggleTodo(todo.id);
-        });
-
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
-        deleteButton.textContent = '删除';
+        deleteButton.dataset.action = 'delete';
 
-        deleteButton.addEventListener('click', event => {
-            // 防止删除时同时触发任务状态切换。
-            event.stopPropagation();
-            removeTodo(todo.id);
-        });
+        // 保留内部元素，方便测试点击按钮内部文字的情况。
+        const deleteLabel = document.createElement('span');
+        deleteLabel.textContent = '删除';
+        deleteButton.appendChild(deleteLabel);
 
-        li.appendChild(deleteButton);
+        li.append(text, deleteButton);
         todoList.appendChild(li);
     });
 }
-
 // 检查输入，添加成功后清空输入框。
 function handleAdd() {
     const content = todoInput.value.trim();
@@ -166,4 +157,32 @@ filterButtons.forEach(button => {
 });
 
 // 显示启动时恢复的任务。
+
+// 只绑定一次，列表重新渲染后仍然有效。
+todoList.addEventListener('click', event => {
+    // 防御一：确认点击目标是元素。
+    if (!(event.target instanceof Element)) return;
+
+    // 防御二：找到所属任务，点击列表空白处时直接结束。
+    const item = event.target.closest('li');
+    if (!item || !todoList.contains(item)) return;
+
+    // 防御三：确认任务 ID 存在。
+    const rawId = item.dataset.id;
+    if (!rawId) return;
+
+    // dataset 读出来是字符串，原来的任务 ID 是数字。
+    const id = Number(rawId);
+    if (!Number.isFinite(id)) return;
+
+    // 点击按钮内部的 span，也能找到删除按钮。
+    const deleteButton =
+        event.target.closest('[data-action="delete"]');
+
+    if (deleteButton && item.contains(deleteButton)) {
+        removeTodo(id);
+    } else {
+        toggleTodo(id);
+    }
+});
 render();
