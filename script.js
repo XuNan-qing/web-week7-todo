@@ -48,22 +48,26 @@ function addTodo(text) {
     render();
 }
 
-// 删除：生成新数组 → 保存 → 重渲染。
+// 删除：记录调用，再更新数据。
 function removeTodo(id) {
+    console.log('[delete]', id);
+
     todos = todos.filter(todo => todo.id !== id);
     save();
     render();
 }
 
-// 清除已完成任务：生成新数组 → 保存 → 重渲染。
+// 清除已完成任务。
 function clearCompleted() {
     todos = todos.filter(todo => !todo.completed);
     save();
     render();
 }
 
-// 切换：生成新数组和新对象 → 保存 → 重渲染。
+// 切换：记录调用，再更新数据。
 function toggleTodo(id) {
+    console.log('[toggle]', id);
+
     todos = todos.map(todo =>
         todo.id === id
             ? { ...todo, completed: !todo.completed }
@@ -97,7 +101,7 @@ function render() {
         button.setAttribute('aria-pressed', String(selected));
     });
 
-        shown.forEach(todo => {
+    shown.forEach(todo => {
         const li = document.createElement('li');
         li.dataset.id = todo.id;
 
@@ -113,7 +117,7 @@ function render() {
         deleteButton.type = 'button';
         deleteButton.dataset.action = 'delete';
 
-        // 保留内部元素，方便测试点击按钮内部文字的情况。
+        // 用于测试点击按钮内部元素的情况。
         const deleteLabel = document.createElement('span');
         deleteLabel.textContent = '删除';
         deleteButton.appendChild(deleteLabel);
@@ -122,6 +126,7 @@ function render() {
         todoList.appendChild(li);
     });
 }
+
 // 检查输入，添加成功后清空输入框。
 function handleAdd() {
     const content = todoInput.value.trim();
@@ -156,14 +161,12 @@ filterButtons.forEach(button => {
     });
 });
 
-// 显示启动时恢复的任务。
-
-// 只绑定一次，列表重新渲染后仍然有效。
+// 父容器统一处理列表点击。
 todoList.addEventListener('click', event => {
     // 防御一：确认点击目标是元素。
     if (!(event.target instanceof Element)) return;
 
-    // 防御二：找到所属任务，点击列表空白处时直接结束。
+    // 防御二：确认找到列表内的任务。
     const item = event.target.closest('li');
     if (!item || !todoList.contains(item)) return;
 
@@ -171,18 +174,20 @@ todoList.addEventListener('click', event => {
     const rawId = item.dataset.id;
     if (!rawId) return;
 
-    // dataset 读出来是字符串，原来的任务 ID 是数字。
+    // dataset 中的字符串转换为数字 ID。
     const id = Number(rawId);
     if (!Number.isFinite(id)) return;
 
-    // 点击按钮内部的 span，也能找到删除按钮。
     const deleteButton =
         event.target.closest('[data-action="delete"]');
 
-    if (deleteButton && item.contains(deleteButton)) {
+    // 任务 2：课件提供的缺陷版本，用于修复前取证。
+        if (deleteButton && item.contains(deleteButton)) {
         removeTodo(id);
     } else {
         toggleTodo(id);
     }
 });
+
+// 显示启动时恢复的任务。
 render();
