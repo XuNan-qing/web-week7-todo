@@ -48,28 +48,49 @@ function addTodo(text) {
     render();
 }
 
-// 删除：生成新数组 → 保存 → 重渲染。
+// 删除：记录调用，再更新数据。
 function removeTodo(id) {
+    console.log('[delete]', id);
+
     todos = todos.filter(todo => todo.id !== id);
     save();
     render();
 }
 
-// 清除已完成任务：生成新数组 → 保存 → 重渲染。
+// 清除已完成任务。
 function clearCompleted() {
     todos = todos.filter(todo => !todo.completed);
     save();
     render();
 }
 
-// 切换：生成新数组和新对象 → 保存 → 重渲染。
+// 切换：记录调用，再更新数据。
 function toggleTodo(id) {
+    console.log('[toggle]', id);
+
     todos = todos.map(todo =>
         todo.id === id
             ? { ...todo, completed: !todo.completed }
             : todo
     );
 
+    save();
+    render();
+}
+
+// 编辑：过滤空输入，生成新数组和新对象，再保存和重渲染。
+function updateTodo(id, text) {
+    if (typeof text !== 'string') return;
+    const content = text.trim();
+    if (content === '') return;
+
+    todos = todos.map(todo =>
+        todo.id === id
+            ? { ...todo, text: content }
+            : todo
+    );
+
+    console.log('[edit]', id);
     save();
     render();
 }
@@ -103,30 +124,30 @@ function render() {
 
         const text = document.createElement('span');
         text.className = 'todo-text';
-
-        // 用户输入作为文本显示。
         text.textContent = todo.text;
-        li.appendChild(text);
 
         if (todo.completed) {
             li.classList.add('done');
         }
 
-        li.addEventListener('click', () => {
-            toggleTodo(todo.id);
-        });
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.dataset.action = 'edit';
+
+        const editLabel = document.createElement('span');
+        editLabel.textContent = '编辑';
+        editButton.appendChild(editLabel);
 
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
-        deleteButton.textContent = '删除';
+        deleteButton.dataset.action = 'delete';
 
-        deleteButton.addEventListener('click', event => {
-            // 防止删除时同时触发任务状态切换。
-            event.stopPropagation();
-            removeTodo(todo.id);
-        });
+        // 用于测试点击按钮内部元素的情况。
+        const deleteLabel = document.createElement('span');
+        deleteLabel.textContent = '删除';
+        deleteButton.appendChild(deleteLabel);
 
-        li.appendChild(deleteButton);
+        li.append(text, editButton, deleteButton);
         todoList.appendChild(li);
     });
 }
@@ -163,6 +184,43 @@ filterButtons.forEach(button => {
     button.addEventListener('click', () => {
         setFilter(button.dataset.filter);
     });
+});
+
+// 父容器统一处理列表点击。
+todoList.addEventListener('click', event => {
+    // 防御一：确认点击目标是元素。
+    if (!(event.target instanceof Element)) return;
+
+    // 防御二：确认找到列表内的任务。
+    const item = event.target.closest('li');
+    if (!item || !todoList.contains(item)) return;
+
+    // 防御三：确认任务 ID 存在。
+    const rawId = item.dataset.id;
+    if (!rawId) return;
+
+    // dataset 中的字符串转换为数字 ID。
+    const id = Number(rawId);
+    if (!Number.isFinite(id)) return;
+
+    const deleteButton =
+        event.target.closest('[data-action="delete"]');
+    const editButton =
+        event.target.closest('[data-action="edit"]');
+
+    // 删除、编辑和切换互斥，一次点击只执行一种操作。
+    if (deleteButton && item.contains(deleteButton)) {
+        removeTodo(id);
+    } else if (editButton && item.contains(editButton)) {
+        const todo = todos.find(todo => todo.id === id);
+        if (!todo) return;
+
+        const text = window.prompt('修改任务', todo.text);
+        if (text === null) return;
+        updateTodo(id, text);
+    } else {
+        toggleTodo(id);
+    }
 });
 
 // 显示启动时恢复的任务。

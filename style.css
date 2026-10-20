@@ -192,6 +192,10 @@ section h2 {
     cursor: pointer;
 }
 
+#todo-list li button[data-action="edit"] {
+    background: #4874cb;
+}
+
 /* 页脚 */
 .footer {
     background: #4874cb;
