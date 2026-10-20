@@ -78,6 +78,23 @@ function toggleTodo(id) {
     render();
 }
 
+// 编辑：过滤空输入，生成新数组和新对象，再保存和重渲染。
+function updateTodo(id, text) {
+    if (typeof text !== 'string') return;
+    const content = text.trim();
+    if (content === '') return;
+
+    todos = todos.map(todo =>
+        todo.id === id
+            ? { ...todo, text: content }
+            : todo
+    );
+
+    console.log('[edit]', id);
+    save();
+    render();
+}
+
 // 切换筛选条件，任务数据不变。
 function setFilter(value) {
     filter = value;
@@ -113,6 +130,14 @@ function render() {
             li.classList.add('done');
         }
 
+        const editButton = document.createElement('button');
+        editButton.type = 'button';
+        editButton.dataset.action = 'edit';
+
+        const editLabel = document.createElement('span');
+        editLabel.textContent = '编辑';
+        editButton.appendChild(editLabel);
+
         const deleteButton = document.createElement('button');
         deleteButton.type = 'button';
         deleteButton.dataset.action = 'delete';
@@ -122,7 +147,7 @@ function render() {
         deleteLabel.textContent = '删除';
         deleteButton.appendChild(deleteLabel);
 
-        li.append(text, deleteButton);
+        li.append(text, editButton, deleteButton);
         todoList.appendChild(li);
     });
 }
@@ -180,10 +205,19 @@ todoList.addEventListener('click', event => {
 
     const deleteButton =
         event.target.closest('[data-action="delete"]');
+    const editButton =
+        event.target.closest('[data-action="edit"]');
 
-    // 任务 2：课件提供的缺陷版本，用于修复前取证。
-        if (deleteButton && item.contains(deleteButton)) {
+    // 删除、编辑和切换互斥，一次点击只执行一种操作。
+    if (deleteButton && item.contains(deleteButton)) {
         removeTodo(id);
+    } else if (editButton && item.contains(editButton)) {
+        const todo = todos.find(todo => todo.id === id);
+        if (!todo) return;
+
+        const text = window.prompt('修改任务', todo.text);
+        if (text === null) return;
+        updateTodo(id, text);
     } else {
         toggleTodo(id);
     }
