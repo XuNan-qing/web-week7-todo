@@ -1,0 +1,15 @@
+{
+  "name": "web-week9-todo-ts",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "typescript": "5.5.4",
+    "vitest": "2.1.9"
+  }
+}

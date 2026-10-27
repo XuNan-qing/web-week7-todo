@@ -1,0 +1,245 @@
+/* 基础样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #eef4ff;
+    font-family: "Microsoft YaHei", Arial, sans-serif;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* 页面布局 */
+.page {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 auto;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 2rem;
+    background: #4874cb;
+    color: white;
+    text-align: center;
+}
+
+.avatar {
+    width: 5rem;
+    height: 5rem;
+    border-radius: 50%;
+    background: white;
+    color: #4874cb;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.header-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.header-info h1 {
+    font-size: 2rem;
+}
+
+.header-info p {
+    font-size: 1rem;
+}
+
+.main {
+    flex: 1;
+    padding: 1.2rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+section {
+    min-width: 0;
+    background: #f4f7ff;
+    padding: 1.25rem;
+    border-radius: .75rem;
+}
+
+section h2 {
+    color: #4874cb;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+/* 技能标签 */
+.skill-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .8rem;
+}
+
+.skill-list span {
+    background: #dce8ff;
+    color: #4874cb;
+    padding: .5rem 1rem;
+    border-radius: 2rem;
+    font-size: .95rem;
+}
+
+/* Todo 输入区域 */
+.todo label {
+    display: block;
+    margin-bottom: .5rem;
+}
+
+.todo-controls {
+    display: flex;
+    gap: .6rem;
+}
+
+.todo-controls input {
+    flex: 1;
+    min-width: 0;
+    padding: .7rem;
+    border: 1px solid #aabfe5;
+    border-radius: .4rem;
+    font: inherit;
+}
+
+.todo-controls button {
+    padding: .7rem 1rem;
+    border: 0;
+    border-radius: .4rem;
+    background: #4874cb;
+    color: white;
+    font: inherit;
+    cursor: pointer;
+}
+
+.todo-controls button:hover {
+    background: #365ca6;
+}
+
+.todo :focus-visible {
+    outline: 3px solid #91b6ff;
+    outline-offset: 2px;
+}
+
+/* 筛选按钮 */
+#todo-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: 1rem;
+}
+
+#todo-filters button {
+    padding: .4rem .8rem;
+    border: 1px solid #4874cb;
+    border-radius: .3rem;
+    background: white;
+    color: #4874cb;
+    font: inherit;
+    cursor: pointer;
+}
+
+#todo-filters button.is-active {
+    background: #4874cb;
+    color: white;
+}
+
+/* 提示和任务列表 */
+.todo-message {
+    min-height: 1.5em;
+    margin-top: .5rem;
+    color: #9c3434;
+}
+
+#todo-list {
+    padding-left: 1.5rem;
+}
+
+#todo-list li {
+    padding: .4rem 0;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+
+#todo-list li.done .todo-text {
+    text-decoration: line-through;
+    color: #888;
+}
+
+#todo-list li button {
+    margin-left: 1rem;
+    padding: .25rem .6rem;
+    border: 0;
+    border-radius: .3rem;
+    background: #c43d3d;
+    color: white;
+    font: inherit;
+    cursor: pointer;
+}
+
+#todo-list li button[data-action="edit"] {
+    background: #4874cb;
+}
+
+/* 页脚 */
+.footer {
+    background: #4874cb;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    font-size: .9rem;
+}
+
+/* 平板布局 */
+@media (min-width: 600px) {
+    .header {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .main {
+        padding: 2rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .intro,
+    .works,
+    .todo {
+        grid-column: span 2;
+    }
+}
+
+/* 大屏布局 */
+@media (min-width: 1000px) {
+    .page {
+        max-width: 60rem;
+    }
+
+    .main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .intro,
+    .works {
+        grid-column: span 1;
+    }
+
+    .todo {
+        grid-column: span 3;
+    }
+}
